@@ -15,50 +15,24 @@ This Flutter app integrates **iOS Live Activities** and **Dynamic Island** to di
 
 ---
 
+## Screenshot 
+
+<p align="center">  
+  <img src="https://raw.githubusercontent.com/ashut08/dynamic_island_iOS_with_flutter/refs/heads/main/Screenshot/home.png" alt="Home" width="250"/>  
+  <img src="https://raw.githubusercontent.com/ashut08/dynamic_island_iOS_with_flutter/refs/heads/main/Screenshot/island1.png" alt="Swipe Left" width="250"/>  
+  <img src="https://raw.githubusercontent.com/ashut08/dynamic_island_iOS_with_flutter/refs/heads/main/Screenshot/island1.png" alt="Uncontacted Tab" width="250"/>  
+ 
+</p>  
+
 ## 📌 Requirements
 - **Flutter 3.x**
 - **Dart 3.x**
 - **Xcode (for iOS development)**
 - **iOS 16.1+ (Live Activities Support)**
 
----
 
-## 🛠 Installation & Setup
 
-### **1️⃣ Add Dependencies**
-Add the `live_activities` package to your `pubspec.yaml`:
-```yaml
-dependencies:
-  live_activities: ^latest_version
-```
-Run:
-```sh
-flutter pub get
-```
 
----
-
-### **2️⃣ iOS Setup**
-#### **🔹 Add Widget Extension in Xcode**
-1. Open your project in Xcode:  
-   ```sh
-   open ios/Runner.xcworkspace
-   ```
-2. Click **File → New → Target...**  
-3. Select **Widget Extension**, name it **DemoIslandiOS**, and activate it.  
-
-#### **🔹 Enable Capabilities**
-Enable these capabilities in **Xcode (Runner & Extension)**:
-- **Background Modes** → Enable **Remote Notifications**
-- **App Groups** → Create a group like `group.com.example.myapp`
-- **Push Notifications** (for remote updates)
-- **Live Activities**: Add this to `Info.plist`:
-  ```xml
-  <key>NSSupportsLiveActivities</key>
-  <true/>
-  ```
-
----
 
 ### **3️⃣ Live Activities Implementation**
 #### **🔹 Dart Code (Start Cooking Timer)**
