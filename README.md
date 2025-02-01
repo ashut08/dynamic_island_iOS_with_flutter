@@ -210,7 +210,7 @@ This will:
 
 ## 📝 Notes
 - **Live Activities** and **Dynamic Island** are only available on devices with **iOS 16.1** or later.
-- **Physical devices** are required to test Live Activities, as they do not work in the simulator.
+
 
 ---
 
