@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:live_activities/live_activities.dart';
 import 'package:intl/intl.dart';
@@ -14,9 +16,11 @@ class _CookingTimerPageState extends State<CookingTimerPage> {
   int? _selectedMinutes;
   String? _activityId;
   final liveActivities = LiveActivities();
-
+  late Timer timer;
   @override
   void initState() {
+    super.initState();
+
     super.initState();
     _initLiveActivities();
   }
@@ -38,21 +42,40 @@ class _CookingTimerPageState extends State<CookingTimerPage> {
       return;
     }
 
+    // Convert the selected minutes to seconds for the countdown
+    double totalTimeInSeconds = (_selectedMinutes ?? 0) * 60;
+
+    // Create the activity with the initial time
     final activityId = await liveActivities.createActivity({
-      'dishName': _dishNameController.text,
-      'endTime': DateTime.now()
-          .add(Duration(minutes: _selectedMinutes!))
-          .toIso8601String(),
+      'dishname': _dishNameController.text,
+      'endtime': totalTimeInSeconds, // Store time in seconds
     });
 
     setState(() {
       _activityId = activityId;
     });
 
+    // Start the timer for the countdown
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+      if (totalTimeInSeconds <= 0) {
+        timer.cancel();
+        _stopCookingTimer();
+        // Stop the timer when time is up
+      } else {
+        totalTimeInSeconds -= 1; // Decrease by one second
+
+        await liveActivities.updateActivity(_activityId ?? "", {
+          'endtime': totalTimeInSeconds, // Update the remaining time
+        });
+      }
+    });
+
+    // ignore: use_build_context_synchronously
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-          content: Text(
-              '🍳 Cooking timer started for ${_dishNameController.text}!')),
+        content:
+            Text('🍳 Cooking timer started for ${_dishNameController.text}!'),
+      ),
     );
   }
 
