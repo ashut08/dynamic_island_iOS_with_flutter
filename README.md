@@ -1,127 +1,254 @@
-# demoisland
 
-Here's the **README.md** file formatted so you can directly paste it into your project. 🚀  
 
----
 
-### **📌 README.md for Cooking Timer & Recipe Tracker**
-```md
-# 🍳 Cooking Timer & Recipe Tracker  
+# 🍳 Cooking Timer App with Live Activities & Dynamic Island
 
-**Cooking Timer & Recipe Tracker** is a **Flutter app** that uses **iOS Live Activities & Dynamic Island** to track cooking times in real-time. The app helps home cooks and chefs by displaying **dish name & remaining cooking time** on **Dynamic Island & Lock Screen**.  
-
-## 📸 Screenshots  
-🚀 *Add images here* (e.g., Dynamic Island showing countdown, app UI, etc.)
+This Flutter app integrates **iOS Live Activities** and **Dynamic Island** to display a **real-time countdown timer** for cooking dishes. The app uses the **[live_activities](https://pub.dev/packages/live_activities)** Flutter package to manage Live Activities and Dynamic Island features on iOS 16.1+ devices.
 
 ---
 
-## 📌 Features  
-✅ **Set a cooking timer for any dish**  
-✅ **Real-time countdown on Dynamic Island**  
-✅ **Automatic updates via Live Activities**  
-✅ **Hands-free tracking while cooking**  
-✅ **Works on iPhone 14 Pro+ & iOS 16.1+**  
+## 🚀 Features
+✅ **Live Activity Timer**: Displays a cooking countdown timer in **Dynamic Island** & **Lock Screen**.  
+✅ **Real-Time Updates**: Updates the remaining time every second.  
+✅ **Flutter & Swift Integration**: Uses **Dart for logic** and **Swift for Live Activity UI**.  
+✅ **iOS 16.1+ Support**: Works only on iPhones with iOS 16.1 or later.  
 
 ---
 
-## 📲 Installation  
+## 📌 Requirements
+- **Flutter 3.x**
+- **Dart 3.x**
+- **Xcode (for iOS development)**
+- **iOS 16.1+ (Live Activities Support)**
 
-### 1️⃣ Clone the Repository  
-```sh
-git clone https://github.com/yourusername/cooking-timer-live-activities.git
-cd cooking-timer-live-activities
+---
+
+## 🛠 Installation & Setup
+
+### **1️⃣ Add Dependencies**
+Add the `live_activities` package to your `pubspec.yaml`:
+```yaml
+dependencies:
+  live_activities: ^latest_version
 ```
-
-### 2️⃣ Install Dependencies  
+Run:
 ```sh
 flutter pub get
 ```
 
-### 3️⃣ iOS Setup  
-1. Open **ios/Runner.xcworkspace** in Xcode.  
-2. Add **Live Activities & App Groups** capabilities:  
-   - **Enable App Groups** (`group.com.example.demoisland`).  
-   - **Enable Push Notifications** (if needed).  
-   - Add the following in **Info.plist** for both `Runner` and `Widget Extension`:  
+---
 
-```xml
-<key>NSSupportsLiveActivities</key>
-<true/>
-```
+### **2️⃣ iOS Setup**
+#### **🔹 Add Widget Extension in Xcode**
+1. Open your project in Xcode:  
+   ```sh
+   open ios/Runner.xcworkspace
+   ```
+2. Click **File → New → Target...**  
+3. Select **Widget Extension**, name it **DemoIslandiOS**, and activate it.  
 
-3. Install iOS dependencies:  
-```sh
-cd ios
-pod install
-```
+#### **🔹 Enable Capabilities**
+Enable these capabilities in **Xcode (Runner & Extension)**:
+- **Background Modes** → Enable **Remote Notifications**
+- **App Groups** → Create a group like `group.com.example.myapp`
+- **Push Notifications** (for remote updates)
+- **Live Activities**: Add this to `Info.plist`:
+  ```xml
+  <key>NSSupportsLiveActivities</key>
+  <true/>
+  ```
 
 ---
 
-## 🚀 Usage  
-
-### **1️⃣ Start Cooking Timer**  
-1. Enter the **dish name**.  
-2. Select **cooking duration**.  
-3. Tap **"Start Cooking Timer"**.  
-
-### **2️⃣ Dynamic Island Updates**  
-- The timer **updates in real-time** on **Dynamic Island**.  
-- Displays **time left & dish name**.  
-
-### **3️⃣ Stop Timer**  
-- Tap **"Stop Cooking Timer"** to end Live Activity.  
-
----
-
-## 🛠 Technology Stack  
-- **Flutter**  
-- **Dart**  
-- **Swift & SwiftUI (ActivityKit, WidgetKit)**  
-- **Live Activities & Dynamic Island (iOS 16.1+)**  
-
----
-
-## 🔗 API & Code Reference  
-
-### **Flutter Live Activities Code**  
+### **3️⃣ Live Activities Implementation**
+#### **🔹 Dart Code (Start Cooking Timer)**
 ```dart
-final activityId = await liveActivities.createActivity({
-  'dishname': _dishNameController.text,
-  'endtime': selectedMinutes * 60,
-});
+import 'dart:async';
+import 'package:live_activities/live_activities.dart';
+
+final liveActivities = LiveActivities();
+String? _activityId;
+Timer? timer;
+
+  @override
+  void initState() {
+    super.initState();
+
+    super.initState();
+    _initLiveActivities();
+  }
+
+  Future<void> _initLiveActivities() async {
+    try {
+      await liveActivities.init(appGroupId: "group.com.example.demoisland");
+    } catch (e) {
+      debugPrint("Error initializing Live Activities: $e");
+    }
+  }
+ Future<void> _startCookingTimer() async {
+    if (_dishNameController.text.isEmpty || _selectedMinutes == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Please enter dish name & select cooking time')),
+      );
+      return;
+    }
+
+    // Convert the selected minutes to seconds for the countdown
+    double totalTimeInSeconds = (_selectedMinutes ?? 0) * 60;
+
+    // Create the activity with the initial time
+    final activityId = await liveActivities.createActivity({
+      'dishname': _dishNameController.text,
+      'endtime': totalTimeInSeconds, // Store time in seconds
+    });
+
+    setState(() {
+      _activityId = activityId;
+    });
+
+    // Start the timer for the countdown
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+      if (totalTimeInSeconds <= 0) {
+        timer.cancel();
+        _stopCookingTimer();
+        // Stop the timer when time is up
+      } else {
+        totalTimeInSeconds -= 1; // Decrease by one second
+
+        await liveActivities.updateActivity(_activityId ?? "", {
+          'endtime': totalTimeInSeconds, // Update the remaining time
+        });
+      }
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content:
+            Text('🍳 Cooking timer started for ${_dishNameController.text}!'),
+      ),
+    );
+  }
+
+  Future<void> _stopCookingTimer() async {
+    if (_activityId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No active cooking timer')),
+      );
+      return;
+    }
+
+    await liveActivities.endActivity(_activityId!);
+
+    setState(() {
+      _activityId = null;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Cooking timer stopped! ⏹️')),
+    );
+  }
+
 ```
 
-### **Swift Live Activity Widget Code**  
+#### **🔹 Swift Code (Live Activity Widget)**
+Modify `DemoIslandiOS.swift`:
 ```swift
-let dishName = sharedDefault.string(forKey: context.attributes.prefixedKey("dishname")) ?? "Unknown"
-let totalTimeValue = sharedDefault.double(forKey: context.attributes.prefixedKey("endtime"))
+import ActivityKit
+import WidgetKit
+import SwiftUI
+
+struct LiveActivitiesAppAttributes: ActivityAttributes, Identifiable {
+    public typealias LiveDeliveryData = ContentState
+
+    public struct ContentState: Codable, Hashable {}
+
+    var id = UUID()
+}
+
+struct  DemoIslandiOS: Widget {
+    var body: some WidgetConfiguration {
+        ActivityConfiguration(for: LiveActivitiesAppAttributes.self) { context in
+            let remainingTime = context.state.remainingTime
+            VStack {
+                Text("🍳 Cooking: \(UserDefaults(suiteName: "group.com.example.myapp")!.string(forKey: "dishname") ?? "Unknown")")
+                    .font(.title3)
+                    .bold()
+                    .foregroundColor(.white)
+                Text("⏳ Remaining Time: \(formattedCountdown(from: remainingTime))")
+                    .font(.headline)
+                    .foregroundColor(.yellow)
+            }
+            .padding()
+            .background(Color.black.opacity(0.8))
+            .clipShape(RoundedRectangle(cornerRadius: 15))
+        } dynamicIsland: { context in
+            let remainingTime = context.state.remainingTime
+            DynamicIsland {
+                DynamicIslandExpandedRegion(.leading) {
+                    Text("🍳 Cooking")
+                }
+                DynamicIslandExpandedRegion(.trailing) {
+                    Text("\(formattedCountdown(from: remainingTime))")
+                }
+                DynamicIslandExpandedRegion(.bottom) {
+                    Text("⌛ Cooking in Progress... \(formattedCountdown(from: remainingTime))")
+                        .font(.headline)
+                        .foregroundColor(.yellow)
+                }
+            } compactLeading: {
+                Text("🍳")
+            } compactTrailing: {
+                Text("\(formattedCountdown(from: remainingTime))")
+            } minimal: {
+                Text("⏳")
+            }
+        }
+    }
+}
+
+// Function to format countdown time in MM:SS format
+func formattedCountdown(from timeInterval: TimeInterval) -> String {
+    let minutes = Int(timeInterval) / 60
+    let seconds = Int(timeInterval) % 60
+    return String(format: "%02d:%02d", minutes, seconds)
+}
 ```
 
 ---
 
-## ✨ Contributing  
-1. **Fork the repository**  
-2. **Create a new branch**  
-3. **Submit a Pull Request (PR)**  
+### **4️⃣ Flutter & Swift Integration**
+- **Flutter** sends data to **Swift** using `UserDefaults` with the **same App Group**.
+- The **Live Activity** is updated every second in **Swift** using the data passed from **Flutter**.
 
 ---
 
-## 📜 License  
-This project is licensed under the **MIT License**.
+## 🏁 Usage
+To start the cooking timer, simply call the `startCookingTimer()` function:
+
+
+
+This will:
+1. Start a Live Activity for the cooking timer.
+2. Update the **Dynamic Island** every second as the countdown decreases.
 
 ---
 
-## 📩 Contact  
-💬 **Created by:** Ashutosh  
-📧 Email: your@email.com  
-🔗 GitHub: [yourusername](https://github.com/yourusername)  
-```
+## 📝 Notes
+- **Live Activities** and **Dynamic Island** are only available on devices with **iOS 16.1** or later.
+- **Physical devices** are required to test Live Activities, as they do not work in the simulator.
 
 ---
 
-### **✅ Next Steps**
-1️⃣ **Paste this into your README.md**  
-2️⃣ **Update placeholders (GitHub username, email, screenshots)**  
-3️⃣ **Push the project to GitHub 🚀**  
+## 🛠 Development Tips
+- Ensure that both **Flutter** and **Swift** use the **same App Group** for sharing data.
+- **Test on a physical device** to view the Dynamic Island behavior.
+- Make sure to handle background execution and edge cases, such as when the app goes into the background.
 
-Let me know if you need any changes! 🎉🔥
+---
+
+## 🔗 Resources
+- [Flutter Live Activities Package](https://pub.dev/packages/live_activities)
+- [iOS ActivityKit Documentation](https://developer.apple.com/documentation/activitykit)
+
+
