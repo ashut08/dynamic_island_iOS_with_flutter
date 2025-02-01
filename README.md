@@ -20,7 +20,7 @@ This Flutter app integrates **iOS Live Activities** and **Dynamic Island** to di
 <p align="center">  
   <img src="https://raw.githubusercontent.com/ashut08/dynamic_island_iOS_with_flutter/refs/heads/main/Screenshot/home.png" alt="Home" width="250"/>  
   <img src="https://raw.githubusercontent.com/ashut08/dynamic_island_iOS_with_flutter/refs/heads/main/Screenshot/island1.png" alt="Swipe Left" width="250"/>  
-  <img src="https://raw.githubusercontent.com/ashut08/dynamic_island_iOS_with_flutter/refs/heads/main/Screenshot/island1.png" alt="Uncontacted Tab" width="250"/>  
+  <img src="https://raw.githubusercontent.com/ashut08/dynamic_island_iOS_with_flutter/refs/heads/main/Screenshot/island2.png" alt="Uncontacted Tab" width="250"/>  
  
 </p>  
 
