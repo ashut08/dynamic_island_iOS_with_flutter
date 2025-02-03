@@ -5,6 +5,10 @@
 
 This Flutter app integrates **iOS Live Activities** and **Dynamic Island** to display a **real-time countdown timer** for cooking dishes. The app uses the **[live_activities](https://pub.dev/packages/live_activities)** Flutter package to manage Live Activities and Dynamic Island features on iOS 16.1+ devices.
 
+## 📖 Blog Post  
+
+https://medium.com/@ashuflutterdev/integrating-ios-live-activities-in-flutter-with-the-live-activities-package-a-comprehensive-guide-08e201bbbe2d
+
 ---
 
 ## 🚀 Features
