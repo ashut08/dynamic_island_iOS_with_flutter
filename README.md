@@ -7,7 +7,9 @@ This Flutter app integrates **iOS Live Activities** and **Dynamic Island** to di
 
 ## 📖 Blog Post  
 
-https://medium.com/@ashuflutterdev/integrating-ios-live-activities-in-flutter-with-the-live-activities-package-a-comprehensive-guide-08e201bbbe2d
+👉 [Read the full guide on Medium](https://medium.com/@ashuflutterdev/integrating-ios-live-activities-in-flutter-with-the-live-activities-package-a-comprehensive-guide-08e201bbbe2d)  
+
+[![Read on Medium](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*L_EWMEIZXEZjIky2VEFHqQ.png)  
 
 ---
 
